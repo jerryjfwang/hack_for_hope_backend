@@ -49,4 +49,17 @@ const getNeighborhoods = async () => {
   return neighborhoods;
 };
 
-module.exports = getNeighborhoods;
+const getNeighborhoodCoordinates = async (neighborhood) => {
+  const { data } = await axios
+    .get(
+      `
+      https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${neighborhood}&inputtype=textquery&fields=geometry&key=${process.env.GOOGLE_MAPS_API_KEY}
+    `
+    )
+    .catch((e) => console.log(e));
+  return data.candidates[0]
+    ? data.candidates[0].geometry.location
+    : { lat: undefined, lng: undefined };
+};
+
+module.exports = { getNeighborhoods, getNeighborhoodCoordinates };
