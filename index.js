@@ -34,8 +34,6 @@ server.get("/", (req, res) => res.send("Hello world!"));
 server.get("/recommendation", getRecommendations);
 
 /* Initalize server instance to listen for requests on specified port */
-server.listen(process.env.SERVER_PORT || 8080, () =>
-  console.log(
-    `Server ready. Listening at port ${process.env.SERVER_PORT || 8080}`
-  )
+server.listen(process.env.PORT || 8080, () =>
+  console.log(`Server ready. Listening at port ${process.env.PORT || 8080}`)
 );
