@@ -14,13 +14,6 @@ const getRecommendations = async (req, res) => {
     daysLeft,
     travelMethod,
   } = req.query;
-  /*
-    const latitude = 34.04403; // user location
-    const longitude = -118.25672; // user location
-    const maxDuration = 10; // in minutes
-    const daysLeft = 6; // days left until groceries run out
-    const travelMethod = "driving"; // driving, walking, bicylcing
-  */
 
   // Get all LA neighborhoods
   const neighborhoods = await getNeighborhoods();
@@ -38,7 +31,6 @@ const getRecommendations = async (req, res) => {
   );
 
   // Get all grocery stores in each neighborhood
-
   const allGroceryStores = require("../neighborhoods.json");
   filteredNeighborhoods.forEach(
     (neighborhood) =>
