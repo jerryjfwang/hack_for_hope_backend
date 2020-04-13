@@ -3,7 +3,7 @@ const axios = require("axios");
 const getGroceryStores = async (neighborhood) => {
   const { data } = await axios
     .get(
-      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${neighborhood}&type=grocery_or_supermarket&key=${process.env.GOOGLE_MAPS_API_KEY}`
+      `https://maps.googleapis.com/maps/api/place/textsearch/json?query=Los Angeles ${neighborhood}&type=grocery_or_supermarket&key=${process.env.GOOGLE_MAPS_API_KEY}`
     )
     .catch((e) => console.log(e));
 
@@ -32,12 +32,14 @@ const getGroceryStores = async (neighborhood) => {
           user_ratings_total,
           photos,
           price_level,
+          place_id,
         },
         i
       ) => ({
         name,
         rating,
         photos,
+        place_id,
         address: formatted_address,
         location: geometry.location,
         totalRatings: user_ratings_total,

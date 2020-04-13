@@ -4,13 +4,23 @@ const {
 } = require("../utils/getNeighborhoods");
 const getDuration = require("../utils/getDuration");
 const filterNeighborhoodsForDuration = require("../utils/filterNeighborhoodsForDuration");
+const getBayesianEstimate = require("../utils/getBayesianEstimate");
 
 const getRecommendations = async (req, res) => {
-  const latitude = 34.04403; // user location
-  const longitude = -118.25672; // user location
-  const maxDuration = 10; // in minutes
-  const daysLeft = 6; // days left until groceries run out
-  const travelMethod = "driving"; // driving, walking, bicylcing
+  const {
+    latitude,
+    longitude,
+    maxDuration,
+    daysLeft,
+    travelMethod,
+  } = req.query;
+  /*
+    const latitude = 34.04403; // user location
+    const longitude = -118.25672; // user location
+    const maxDuration = 10; // in minutes
+    const daysLeft = 6; // days left until groceries run out
+    const travelMethod = "driving"; // driving, walking, bicylcing
+  */
 
   // Get all LA neighborhoods
   const neighborhoods = await getNeighborhoods();
@@ -28,6 +38,7 @@ const getRecommendations = async (req, res) => {
   );
 
   // Get all grocery stores in each neighborhood
+
   const allGroceryStores = require("../neighborhoods.json");
   filteredNeighborhoods.forEach(
     (neighborhood) =>
@@ -69,6 +80,7 @@ const getRecommendations = async (req, res) => {
   neighborhoodsWithinDuration.forEach(
     ({ cases }) => (minCases = Math.min(minCases, cases))
   );
+
   neighborhoodsWithinDuration
     .sort((a, b) => a.cases - b.cases)
     .every((neighborhood) => {
@@ -80,13 +92,33 @@ const getRecommendations = async (req, res) => {
 
   // Get all the grocery stores from those neighborhoods
   const safestGroceryStores = [];
-  safestNeighborhoods.forEach(({ groceryStores }) =>
-    safestGroceryStores.push(...groceryStores)
-  );
+  const seen = {};
+  safestNeighborhoods.forEach(({ name, cases, groceryStores }) => {
+    const formattedGroceryStores = [];
+    groceryStores.forEach((groceryStore) => {
+      if (!seen[groceryStore.address]) {
+        seen[groceryStore.address] = true;
+        formattedGroceryStores.push({
+          ...groceryStore,
+          neighborhood: name,
+          cases,
+        });
+      }
+    });
+    safestGroceryStores.push(...formattedGroceryStores);
+  });
 
-  // Sort the safest grocery stores by their total ratings and filter out any with less than 10 ratings
+  // Sort the safest grocery stores by their Bayesian estimates and filter out any with less than 10 ratings
+  const averageRating =
+    safestGroceryStores.reduce((acc, { rating }) => acc + rating, 0) /
+    safestGroceryStores.length;
+
   const recommendations = safestGroceryStores
-    .sort((a, b) => b.totalRatings - a.totalRatings)
+    .sort(
+      (a, b) =>
+        getBayesianEstimate(averageRating, b) -
+        getBayesianEstimate(averageRating, a)
+    )
     .filter(({ totalRatings }) => totalRatings >= 10);
 
   // Return the top three grocery stores with the optimal busy times
@@ -95,3 +127,17 @@ const getRecommendations = async (req, res) => {
 };
 
 module.exports = getRecommendations;
+
+/*
+  const writeToJson = require("write-json-file");
+  const getGroceryStores = require("../utils/getGroceryStores");
+
+  const d = {};
+  const g = await Promise.all(
+    neighborhoods.map(({ name }) => getGroceryStores(name))
+  );
+  neighborhoods.forEach((neighborhood, i) => {
+    d[neighborhood.name] = g[i];
+  });
+  writeToJson("n.json", d);
+*/

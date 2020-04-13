@@ -53,10 +53,12 @@ const getNeighborhoodCoordinates = async (neighborhood) => {
   const { data } = await axios
     .get(
       `
-      https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${neighborhood}&inputtype=textquery&fields=geometry&key=${process.env.GOOGLE_MAPS_API_KEY}
+      https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=Los Angeles ${neighborhood}&inputtype=textquery&fields=geometry&key=${process.env.GOOGLE_MAPS_API_KEY}
     `
     )
     .catch((e) => console.log(e));
+
+  if (neighborhood === "Chinatown") console.log(data.candidates[0]);
   return data.candidates[0]
     ? data.candidates[0].geometry.location
     : { lat: undefined, lng: undefined };
