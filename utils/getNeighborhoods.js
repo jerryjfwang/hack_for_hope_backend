@@ -58,7 +58,6 @@ const getNeighborhoodCoordinates = async (neighborhood) => {
     )
     .catch((e) => console.log(e));
 
-  if (neighborhood === "Chinatown") console.log(data.candidates[0]);
   return data.candidates[0]
     ? data.candidates[0].geometry.location
     : { lat: undefined, lng: undefined };

@@ -52,9 +52,15 @@ const getRecommendations = async (req, res) => {
           )
         )
       );
-      const filteredGroceryStores = groceryStores.filter(
-        (_, i) => durations[i] <= maxDuration
+      
+      const filteredGroceryStores = [];
+      groceryStores.forEach(
+        (groceryStore, i) => {
+          if(durations[i] <= maxDuration)
+          filteredGroceryStores.push({...groceryStore, duration: durations[i]})
+        }
       );
+
       if (filteredGroceryStores.length)
         neighborhoodsWithinDuration.push({
           name,

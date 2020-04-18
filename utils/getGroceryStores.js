@@ -1,5 +1,4 @@
 const axios = require("axios");
-
 const getGroceryStores = async (neighborhood) => {
   const { data } = await axios
     .get(
