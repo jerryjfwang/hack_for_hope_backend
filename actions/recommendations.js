@@ -121,7 +121,7 @@ const getRecommendations = async (req, res) => {
 
   // Return the top three grocery stores with the optimal busy times
 
-  res.json({ recommendations });
+  res.json({ recommendations: recommendations.slice(0, 5) });
 };
 
 module.exports = getRecommendations;
