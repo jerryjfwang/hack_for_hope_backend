@@ -20,7 +20,7 @@ const getDuration = async (
     https://maps.googleapis.com/maps/api/distancematrix/json?origins=${userLatitude},${userLongitude}&destinations=${destinationLatitude}, ${destinationLongitude}&mode=${mode}&key=${process.env.GOOGLE_MAPS_API_KEY}
     `);
 
-  return data.rows[0].elements[0].duration
+  return data.rows && data.rows[0].elements[0].duration
     ? data.rows[0].elements[0].duration.value / 60
     : 0;
 };
